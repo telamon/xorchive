@@ -7,7 +7,7 @@
 
 A loose implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
 
-- XOR-pad encrypts contents (default 7 pads)
+- [XOR-pad encrypts](https://en.wikipedia.org/wiki/XOR_cipher) contents (default 7 pads)
 - Unknown total amount of files
 - Can contain nothing
 - Can contain something
