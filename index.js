@@ -4,19 +4,22 @@ const { defer } = require('deferinfer')
 const { hash } = require('blake3')
 const { randomBytes } = require('crypto')
 
-const PAD_L = 128 << 10 // 128kB pads
-const HL = 32 // 32byte hash length
+const S128K = 128 << 10 // 128kB pads
 
 module.exports = class Xorchive {
-  constructor (storage, defaultPadCount = 7) {
+  constructor (storage, defaultPadCount = 7, padSize = S128K, hashSize = 32) {
     this.storage = storage
     this.c = defaultPadCount
     this._indexDirty = true
     this._index = null
     this._pids = []
+    this.padSize = padSize
+    this.hashSize = hashSize
   }
 
   async _prepIndex () {
+    const PAD_L = this.padSize
+    const HL = this.hashSize
     if (this._index) return false
     // Load existing INDEX file if available
     if (!this._index) this._index = this.storage('INDEX')
@@ -28,7 +31,8 @@ module.exports = class Xorchive {
         o += HL
       }
     } catch (err) {
-      if (err.message !== 'Could not satisfy length') throw err
+      if (err.message !== 'Could not satisfy length' &&
+        err.code !== 'ENOENT') throw err
     }
     this._indexDirty = false
 
@@ -55,6 +59,7 @@ module.exports = class Xorchive {
   }
 
   async _storePad (buf) {
+    const HL = this.hashSize
     const h = hash(buf, HL)
     const file = this.storage(fnameOf(h))
     await defer(d => file.write(0, buf, d))
@@ -64,6 +69,7 @@ module.exports = class Xorchive {
   }
 
   async _getPad (id) {
+    const PAD_L = this.padSize
     const file = this.storage(fnameOf(id))
     const pad = await defer(done => file.read(0, PAD_L, done))
     // TODO: cache pad
@@ -71,6 +77,7 @@ module.exports = class Xorchive {
   }
 
   async store (data) {
+    const PAD_L = this.padSize
     await this._prepIndex()
     let o = 0
     const key = []
@@ -94,6 +101,8 @@ module.exports = class Xorchive {
   }
 
   async recover (key, nC) {
+    const HL = this.hashSize
+    const PAD_L = this.padSize
     const nPads = (nC || this.c) + 1 // The oneUp is for the pad containing the encrypted data
     if (key.length / nPads !== HL) throw new Error('InvalidParameters')
     const nChunks = key.length / HL / nPads
