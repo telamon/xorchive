@@ -3,7 +3,7 @@
 const { defer } = require('deferinfer')
 const { hash } = require('blake3')
 const { randomBytes } = require('crypto')
-
+const randomNumber = require('pure-random-number')
 const S128K = 128 << 10 // 128kB pads
 
 module.exports = class Xorchive {
@@ -39,7 +39,7 @@ module.exports = class Xorchive {
     // generate new upto twice of compound count
     // if needed
     while (this._pids.length < this.c * 2) {
-      const buf = randomBytes(PAD_L)
+      const buf = await defer(d => randomBytes(PAD_L, d))
       await this._storePad(buf)
     }
     await this._storeIndex()
@@ -84,7 +84,7 @@ module.exports = class Xorchive {
     while (o < data.length) {
       const chunk = data.slice(o, Math.min(o + PAD_L, data.length))
       o += PAD_L
-      const padIds = this._selectUniqueRandom(this.c)
+      const padIds = await this._selectUniqueRandom(this.c)
       const pads = await Promise.all(padIds.map(this._getPad.bind(this)))
       const cpad = Buffer.allocUnsafe(PAD_L)
       for (let i = 0; i < PAD_L; i++) {
@@ -131,14 +131,14 @@ module.exports = class Xorchive {
     return Buffer.concat(waste)
   }
 
-  _selectUniqueRandom (c) {
+  async _selectUniqueRandom (c) {
     const out = []
-    const can = [...this._pids]
     while (out.length < c) {
-      // Is this random enough?
-      out.push(can.sort(() => 0.5 - Math.random()).shift())
+      const rn = await randomNumber(0, this._pids.length - 1)
+      if (out.indexOf(rn) !== -1) continue
+      out.push(rn)
     }
-    return out
+    return out.map(i => this._pids[i])
   }
 }
 
