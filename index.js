@@ -125,8 +125,8 @@ module.exports = class Xorchive {
       const out = Buffer.allocUnsafe(PAD_L)
       for (let x = 0; x < PAD_L; x++) {
         out[x] = 0
-        for (let j = 0; j < pads.length; j++){
-          out[x] ^= pads[j][x + j]
+        for (let j = 0; j < pads.length; j++) {
+          out[x] ^= pads[j][(x + j) % PAD_L]
         }
       }
       // yield out // Async generator?
