@@ -88,7 +88,10 @@ module.exports = class Xorchive {
       const pads = await Promise.all(padIds.map(this._getPad.bind(this)))
       const cpad = Buffer.allocUnsafe(PAD_L)
       for (let i = 0; i < PAD_L; i++) {
-        cpad[i] = pads.reduce((c, n) => c ^ n[i], chunk[i] || 0)
+        cpad[i] = chunk[i]
+        for (let j = 0; j < pads.length; j++) {
+          cpad[i] ^= pads[j][(i + j + 1) % PAD_L]
+        }
       }
       const ch = await this._storePad(cpad)
       const chunkKey = [ch, ...padIds]
@@ -121,7 +124,10 @@ module.exports = class Xorchive {
 
       const out = Buffer.allocUnsafe(PAD_L)
       for (let x = 0; x < PAD_L; x++) {
-        out[x] = pads.reduce((c, n) => c ^ n[x], 0)
+        out[x] = 0
+        for (let j = 0; j < pads.length; j++){
+          out[x] ^= pads[j][x + j]
+        }
       }
       // yield out // Async generator?
       // Should probably synchroneously return a readable stream
