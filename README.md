@@ -4,7 +4,7 @@
 
 > Hyper dimensional storage
 
-A loose implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
+A variant implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
 
 No way to tell how many entries an archive contains.
 Each pad in the archive might or might not be part of multiple files.
@@ -19,10 +19,6 @@ Each pad in the archive might or might not be part of multiple files.
 
 ```
 yarn add xorchive
-
-# -OR-
-
-npm i --save xorchive
 ```
 
 ## <a name="usage"></a> Usage
