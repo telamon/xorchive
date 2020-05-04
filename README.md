@@ -34,13 +34,17 @@ const Xorchive = require('xorchive')
 
 const xfs = new Xorchive(raf('myStuff/'), nPads = 7)
 
-const k1 = await xfs.store(readFileSync('~/secret_evidence.md'))
+let k1 = await xfs.store(readFileSync('~/secret_evidence.md'))
 const k2 = await xfs.store(readFileSync('~/README.md'))
 // Each key is (32 * nPads) bytes in size
 
 const doc = await xfs.recover(k2)
+
+let k1 = null // secret_evidence.md is now lost forever,
+// and there's no proof of it ever having been stored.
 ```
-## Ad
+
+## Donations
 
 ```ad
  _____                      _   _           _
@@ -71,9 +75,20 @@ Discord: https://discord.gg/K5XjmZx
 Telegram: https://t.me/decentlabs_se
 ```
 
+
+## <a name="changelog"></a> Changelog
+
+### 1.1.0
+- added pad rotatation by oridnal to make the order of pads significant.
+- fixed chunked store/recover
+
+### 1.0.0
+- first release
+
 ## <a name="contribute"></a> Contributing
 
-Ideas and contributions to the project are welcome. But you must follow the [guidelines](https://github.com/telamon/xorchive/blob/master/CONTRIBUTING.md).
+Be aware that by contributing code to this project, you agree to release your modifications under the license stated below.
+You are also implicitly verifying that all code is your original work.
 
 ## License
 

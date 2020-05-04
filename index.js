@@ -76,7 +76,14 @@ module.exports = class Xorchive {
     return pad
   }
 
-  async store (data) {
+  /* The returned key size will be
+   * keyBytes = (input / PAD_LENGTH (?+1)) * (padCount + 1) * HASH_LENGTH
+   * Storing a 12MB file using 128KB pads with 8 pads for each chunk
+   * will cause a 24576B key. Not too shabby
+   * (12 << 20) / (128 << 10) * 8 * 32 = 24576
+   * Using bigger pads like 1MB will cause the same key to shrink to 3072B
+   */
+  async store (data, nPads) {
     const PAD_L = this.padSize
     await this._prepIndex()
     let o = 0
@@ -84,18 +91,18 @@ module.exports = class Xorchive {
     while (o < data.length) {
       const chunk = data.slice(o, Math.min(o + PAD_L, data.length))
       o += PAD_L
-      const padIds = await this._selectUniqueRandom(this.c)
+      const padIds = await this._selectUniqueRandom(nPads || this.c)
       const pads = await Promise.all(padIds.map(this._getPad.bind(this)))
       const cpad = Buffer.allocUnsafe(PAD_L)
       for (let i = 0; i < PAD_L; i++) {
-        cpad[i] = chunk[i]
+        cpad[i] = chunk[i] || 0 // Zero-pad missing length.
         for (let j = 0; j < pads.length; j++) {
           cpad[i] ^= pads[j][(i + j + 1) % PAD_L]
         }
       }
       const ch = await this._storePad(cpad)
       const chunkKey = [ch, ...padIds]
-      // console.log('Enc,chunkKey')
+      // console.log('Enc key of chunk #', o / PAD_L)
       // console.log(chunkKey.map(k => k.hexSlice(0, 8)).join('\n'))
       key.push(Buffer.concat(chunkKey))
     }
@@ -107,16 +114,15 @@ module.exports = class Xorchive {
     const HL = this.hashSize
     const PAD_L = this.padSize
     const nPads = (nC || this.c) + 1 // The oneUp is for the pad containing the encrypted data
-    if (key.length / nPads !== HL) throw new Error('InvalidParameters')
     const nChunks = key.length / HL / nPads
     if (Math.floor(nChunks) !== nChunks) throw new Error('InvalidParameters')
     const waste = []
     for (let i = 0; i < nChunks; i++) {
-      const kOff = i * nPads
-      // console.log('Dec,chunkKey')
+      const kOff = i * nPads * HL
+      // console.log('Dec key of chunk #', i)
       const pads = []
       for (let j = 0; j < nPads; j++) {
-        const pid = (key.slice(kOff + j * HL, kOff + (j + 1) * HL))
+        const pid = key.slice(kOff + j * HL, kOff + (j + 1) * HL)
         // console.log(pid.hexSlice(0, 8))
         const pad = await this._getPad(pid)
         pads.push(pad)
