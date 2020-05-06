@@ -2,7 +2,7 @@
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 # xorchive
 
-> Hyper dimensional storage
+> Hyperdimensional lockbox
 
 A variant implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
 
