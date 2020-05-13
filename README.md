@@ -2,14 +2,14 @@
 [`code style | standard`](https://standardjs.com/)
 # xorchive
 
-> Hyper dimensional storage
+> Hyperdimensional lockbox
 
 A variant implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
 
 No way to tell how many entries an archive contains.
 Each pad in the archive might or might not be part of multiple files.
 
-- Sits ontop of [random-access-storage](https://github.com/random-access-storage)
+- Sits ontop of [random-access-storage](https://github.com/random-access-storage) (works in browser + node)
 - [XOR-pad encrypts](https://en.wikipedia.org/wiki/XOR_cipher) contents (default 7 pads)
 - Unknown total amount of files
 - Unique key for each file
