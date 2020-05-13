@@ -1,7 +1,7 @@
 {
   "name": "xorchive",
   "version": "1.1.0",
-  "description": "Hyper dimensional storage, OFFS variant",
+  "description": "Hyperdimensional lockbox, OFFS variant",
   "main": "index.js",
   "files": [
     "lib",
