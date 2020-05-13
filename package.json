@@ -1,7 +1,7 @@
 {
   "name": "xorchive",
   "version": "1.1.0",
-  "description": "placeholder",
+  "description": "Hyper dimensional storage, OFFS variant",
   "main": "index.js",
   "files": [
     "lib",
@@ -9,8 +9,8 @@
     "index.js"
   ],
   "scripts": {
-    "test": "tape test/*.js",
-    "debug": "node inspect $(npm bin)/tape test/*.js",
+    "test": "tape test.js",
+    "debug": "node inspect $(npm bin)/tape test.js",
     "lint": "standard",
     "prepublishOnly": "npm test"
   },
@@ -28,7 +28,7 @@
     "type": "git",
     "url": "git+https://github.com/telamon/xorchive.git"
   },
-  "keywords": [],
+  "keywords": ["offs", "owner free", "archive", "xor", "pad"],
   "author": {
     "name": "Tony Ivanov",
     "email": "telamohn@pm.me"

@@ -2,7 +2,7 @@ const test = require('tape')
 const { readFileSync } = require('fs')
 const ram = require('random-access-memory')
 const { randomBytes } = require('crypto')
-const Xorchive = require('..')
+const Xorchive = require('.')
 
 const RamFS = () => {
   const opened = {}
@@ -47,6 +47,20 @@ test('chunks', async t => {
     const x2 = new Xorchive(store, 7, 64)
     const output = await x2.recover(key)
     t.ok(output.equals(input))
+  } catch (e) { t.error(e) }
+  t.end()
+})
+
+test('lengths', async t => {
+  try {
+    const store = RamFS()
+    const input = randomBytes(55)
+    const x1 = new Xorchive(store)
+    const key = await x1.store(input)
+
+    const x2 = new Xorchive(store)
+    const output = await x2.recover(key)
+    t.equal(output.length, input.length)
   } catch (e) { t.error(e) }
   t.end()
 })

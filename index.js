@@ -89,8 +89,26 @@ module.exports = class Xorchive {
     let o = 0
     const key = []
     while (o < data.length) {
-      const chunk = data.slice(o, Math.min(o + PAD_L, data.length))
+      let chunk = data.slice(o, Math.min(o + PAD_L, data.length))
+
+      if (o + PAD_L >= data.length) { // Detect last chunk
+        const lastChunkSize = data.length - o
+        // TODO: When you can't fit the size-uint and yet the last chunk is smaller
+        // than the pad :/
+        if (lastChunkSize + 4 > PAD_L) throw new Error('Please open an issue: telamon/xorchive')
+        // we can use varint encoding here but i don't wanna add more depends
+        // for a flawed method. Suggestions appreciated.
+        const tmp = Buffer.alloc(chunk.length + 4) // Intentional safe alloc
+        // 1. Stash lastChunkSize as Uint32
+        tmp.writeUInt32BE(lastChunkSize, 0)
+        // 2. Relocate chunk data to 4 bytes.
+        chunk.copy(tmp, 4)
+        // 3. overwrite chunk reference
+        chunk = tmp
+        console.log('Packed chunk marker', lastChunkSize)
+      }
       o += PAD_L
+
       const padIds = await this._selectUniqueRandom(nPads || this.c)
       const pads = await Promise.all(padIds.map(this._getPad.bind(this)))
       const cpad = Buffer.allocUnsafe(PAD_L)
@@ -135,10 +153,17 @@ module.exports = class Xorchive {
           out[x] ^= pads[j][(x + j) % PAD_L]
         }
       }
+
       // yield out // Async generator?
       // Should probably synchroneously return a readable stream
       // but this is a quick and dirty impl so let's waste some memory.
-      waste.push(out)
+      if (i + 1 !== nChunks) waste.push(out)
+      else {
+        // last chunk should contain a length-marker at the first 4 bytes.
+        const dataSize = out.readUInt32BE(0)
+        if (dataSize + 4 > PAD_L) throw new Error(`Not chunkSize marker ${dataSize} + 4 > ${PAD_L}`)
+        waste.push(out.slice(4, 4 + dataSize))
+      }
     }
     return Buffer.concat(waste)
   }

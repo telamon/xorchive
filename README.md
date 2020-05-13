@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/telamon/xorchive.svg?branch=master)](https://travis-ci.org/telamon/xorchive)
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[`pure | mod`](https://github.com/telamon/create-pure)
+[`code style | standard`](https://standardjs.com/)
 # xorchive
 
 > Hyper dimensional storage
@@ -39,6 +39,34 @@ let k1 = null // secret_evidence.md is now lost forever,
 // and there's no proof of it ever having been stored.
 ```
 
+## API
+
+### `new Xorchive(storage, nPads = 7, padSize = 128kB, hashSize = 32)`
+
+Initialized a new archive.
+
+- `nPads` number of random pads to use for chunk encryption.
+- `padSize` the size of a pad. defaults to `128 << 10`
+- `hashSize` blake3 hashSize
+
+
+### `store(data)`
+
+Encrypts your data as `data.length / padSize` chunks and
+returns a Promise for a `key`-buffer containing all the hashes of the pads
+used during encryption.
+
+
+- `data` accepts Buffer, UInt8Array and Array
+
+### `recover(key)`
+
+Attempts to find all the pads referenced in the key and reconstruct the
+original data.
+
+returns a Promsie that resolves to your original data if
+the key is valid.
+
 ## Donations
 
 ```ad
@@ -73,6 +101,9 @@ Telegram: https://t.me/decentlabs_se
 
 ## <a name="changelog"></a> Changelog
 
+### 1.2.0
+- added API docs
+- "fixed" data-length returned by Xorchive#recover() in most cases
 ### 1.1.0
 - added pad rotatation by oridnal to make the order of pads significant.
 - fixed chunked store/recover
@@ -82,8 +113,10 @@ Telegram: https://t.me/decentlabs_se
 
 ## <a name="contribute"></a> Contributing
 
-Be aware that by contributing code to this project, you agree to release your modifications under the license stated below.
-You are also implicitly verifying that all code is your original work.
+By making a pull request, you agree to release your modifications under
+the license stated in the next section.
+
+Only changesets by human contributors will be accepted.
 
 ## License
 
