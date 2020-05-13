@@ -15,20 +15,26 @@
     "prepublishOnly": "npm test"
   },
   "dependencies": {
-    "blake3": "^2.1.3",
+    "blake3": "^2.1.4",
     "deferinfer": "^1.0.1",
     "pure-random-number": "^2.0.1"
   },
   "devDependencies": {
     "random-access-memory": "^3.1.1",
-    "standard": "^14.3.1",
+    "standard": "^14.3.4",
     "tape": "^5.0.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/telamon/xorchive.git"
   },
-  "keywords": ["offs", "owner free", "archive", "xor", "pad"],
+  "keywords": [
+    "offs",
+    "owner free",
+    "archive",
+    "xor",
+    "pad"
+  ],
   "author": {
     "name": "Tony Ivanov",
     "email": "telamohn@pm.me"
