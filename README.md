@@ -2,11 +2,12 @@
 [`code style | standard`](https://standardjs.com/)
 # xorchive
 
-> Hyperdimensional lockbox
+> Hyperdimensional lockbox - Non-enumerable blob storage.
 
 A variant implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
 
-No way to tell how many entries an archive contains.
+Files stored in this archive are mixed with witenoise,
+without the `key` a file cannot be recovered, let alone proven to have been stored.
 Each pad in the archive might or might not be part of multiple files.
 
 - Sits ontop of [random-access-storage](https://github.com/random-access-storage) (works in browser + node)
