@@ -6,7 +6,7 @@
 
 A variant implementation of [OFFS technique](https://en.wikipedia.org/wiki/OFFSystem).
 
-Files stored in this archive are mixed with witenoise,
+Files stored in this archive white-noise encrypted,
 without the `key` a file cannot be recovered, let alone proven to have been stored.
 Each pad in the archive might or might not be part of multiple files.
 
